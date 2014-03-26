@@ -76,7 +76,9 @@
   (values))
 (defmethod traverse ((obj symbol))
   (values))
-(defmethod traverse ((obj string)) ;; should probably treat as multiply referable object eventually?
+(defmethod traverse ((obj string))
+  ;; we probably should eventually treat strings as objects that can be referred
+  ;; to rather than as inline constants like numbers and symbols
   (values))
 (defmethod traverse ((obj character))
   (values))
@@ -136,97 +138,91 @@
   obj)
 
 (defmethod reify ((obj built-in-class))
-  ;;(print "reifying built-in")
   (class-name obj))
 
 ;;(defmethod reify ((obj sb-pcl::slot-object))
 ;;  (class-name obj))
 
-;;(defmethod reify ((obj (eql ))))
-
 (defmethod reify-full ((obj standard-class) id)
-  ;;(print "reifying class")
-  ;;(print obj)
-  (make-instance 'reified-class
-                 :id id
-                 :name (class-name obj)
-                 :cpl (mapcar
-                       (lambda (cls)
-                         (reify cls))
-                       (catch 'trap-unbound
-                         (handler-bind ((unbound-slot
-                                         #'(lambda (c)
-                                             (declare (ignore c))
-                                             (throw 'trap-unbound nil))))
-                           (closer-mop:class-precedence-list obj))))
-                 :slot-list (mapcar #'closer-mop:slot-definition-name (closer-mop:class-slots obj))
-                 ))
+  (make-instance
+   'reified-class
+   :id id
+   :name (class-name obj)
+   :cpl (mapcar
+         (lambda (cls)
+           (reify cls))
+         (catch 'trap-unbound
+           (handler-bind ((unbound-slot
+                           #'(lambda (c)
+                               (declare (ignore c))
+                               (throw 'trap-unbound nil))))
+             (closer-mop:class-precedence-list obj))))
+   :slot-list (mapcar #'closer-mop:slot-definition-name
+                      (closer-mop:class-slots obj))))
 
 
 
 (defmethod reify-full ((obj standard-object) id)
   (let ((klass (class-of obj)))
-    ;;(print (type-of klass))
-    ;;(print klass)
-    ;;(print (closer-mop:class-precedence-list klass))
-    (make-instance 'reified-object
-      :id id
-      :object-class
-      (let ((*print-case* :downcase))
-        (format nil "~a" (class-name klass)))
-      ;;(print (reify (class-of obj)))
-      :slots
-      (asdf::while-collecting (c)
-        (dolist (slot-def (closer-mop:class-slots klass))
-          ;; ignore :class-allocated slots for now... may need to reify classes?
-          (when (eq (closer-mop:slot-definition-allocation slot-def) :instance)
-            (c (list
-                (let ((*print-case* :downcase))
-                  (format nil "~a" (closer-mop:slot-definition-name slot-def)))
-                (reify (slot-value obj (closer-mop:slot-definition-name slot-def)))))))))))
+    (make-instance
+     'reified-object
+     :id id
+     :object-class
+     (let ((*print-case* :downcase))
+       (format nil "~a" (class-name klass)))
+     :slots
+     (asdf::while-collecting (c)
+       (dolist (slot-def (closer-mop:class-slots klass))
+         ;; ignore :class-allocated slots for now... may need to reify classes?
+         (when (eq (closer-mop:slot-definition-allocation slot-def) :instance)
+           (c (list
+               (let ((*print-case* :downcase))
+                 (format nil "~a" (closer-mop:slot-definition-name slot-def)))
+               (reify (slot-value obj (closer-mop:slot-definition-name slot-def)))))))))))
 
 (defun simple-list-p (obj)
+  ;; could replace this with (every #'atom obj)... not sure about performance implications
   (and (listp obj) (not (listp (car obj)))
        (or (null (cdr obj))
            (simple-list-p (cdr obj)))))
 
 (defmethod reify-full ((obj sequence) id)
-  (make-instance 'reified-sequence
-                 :id id
-                 :contained-sequence (map 'list (lambda (s) (reify s)) obj))
-  )
-(defmethod reify-full ((obj cons) id)
-  (make-instance 'reified-cons
-                 :id id
-                 :contained-car (reify (car obj))
-                 :contained-cdr (reify (cdr obj))
+  (make-instance
+   'reified-sequence
+   :id id
+   :contained-sequence (map 'list (lambda (s) (reify s)) obj)))
 
-                 )
+(defmethod reify-full ((obj cons) id)
+  (make-instance
+   'reified-cons
+   :id id
+   :contained-car (reify (car obj))
+   :contained-cdr (reify (cdr obj)))
   #+nil
   (if (simple-list-p obj)
       (reify-full (coerce obj 'simple-vector) id)
-      (make-instance 'reified-cons
-                     :id id
-                     :contained-car (reify (car obj))
-                     :contained-cdr (reify (cdr obj)))))
+      (make-instance
+       'reified-cons
+       :id id
+       :contained-car (reify (car obj))
+       :contained-cdr (reify (cdr obj)))))
 
 (defmethod reify-full ((obj hash-table) id)
-  (make-instance 'reified-hash-table
-                 :id id
-                 :test (hash-table-test obj)
-                 :contained-pairs (asdf::while-collecting (c)
-                          (maphash
-                           (lambda (key value)
-                             (c (reify key))
-                             (c (reify value)))
-                           obj))))
+  (make-instance
+   'reified-hash-table
+   :id id
+   :test (hash-table-test obj)
+   :contained-pairs (asdf::while-collecting (c)
+                      (maphash
+                       (lambda (key value)
+                         (c (reify key))
+                         (c (reify value)))
+                       obj))))
 
 
 
 ;; reify eagerly -- define children before we finish defining parents
 (defmethod reify ((obj t))
-  ;;(print "reifying")
-  ;;(print obj)
   (let ((id (registered obj)))
     (cond
       ;; get rid of this case and this method might be equivalent to traverse...
@@ -340,7 +336,6 @@
           (asdf::while-collecting (c)
             (for-each (stateful:<hash-table> <eql>) *memory*
                       (lambda (pair)
-                        ;;(print pair)
                         (c (cdr pair)))))))
 
 

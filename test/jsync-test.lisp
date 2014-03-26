@@ -41,4 +41,3 @@
     (let ((jsync (encode-jsync-object the-object)))
       (is (string= jsync
                    (encode-jsync-object (decode-jsync jsync)))))))
-

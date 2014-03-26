@@ -12,18 +12,20 @@
      
      (closer-mop:finalize-inheritance (find-class ',name))
      (stateful:insert (stateful:<hash-table> <equal>) *serializable-classes*
-             (let ((*print-case* :downcase)) (format nil "~A" ',name ;(symbol-name ',name)
+             (let ((*print-case* :downcase))
+               (format nil "~A" ',name ;(symbol-name ',name)
                                                      ))
-             (list ',name (mapcar
-                               (lambda (x)
-                                 (cons
-                                  (let ((*print-case* :downcase))
-                                    (format nil "~A"
-                                            (closer-mop:slot-definition-name x)
-                                            ;;(symbol-name (closer-mop:slot-definition-name x))
-                                            ))
-                                  (closer-mop:slot-definition-name x)))
-                               (closer-mop:class-slots (find-class ',name))))
+             (list ',name
+                   (mapcar
+                    (lambda (x)
+                      (cons
+                       (let ((*print-case* :downcase))
+                         (format nil "~A"
+                                 (closer-mop:slot-definition-name x)
+                                 ;;(symbol-name (closer-mop:slot-definition-name x))
+                                 ))
+                       (closer-mop:slot-definition-name x)))
+                    (closer-mop:class-slots (find-class ',name))))
              ;;(let ((*print-case* :downcase)) (format nil "~A") (symbol-name ',name))
              ;;(cons (let ((*print-case* :downcase)) (format nil "~A") (symbol-name ',name))
              ;;    (list ',name (mapcar
@@ -203,8 +205,5 @@
     :initarg :cpl)
    (slot-list
     :accessor slot-list
-    :initarg :slot-list
-    )
-   )
-  )
+    :initarg :slot-list)))
 

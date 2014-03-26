@@ -134,13 +134,10 @@
          (validate-descendants obj))
         (t
          (insert *map* id obj)
-         ;;(format t "~&~A ~A ~A~&" "id1" (type-of id) (type-of (id obj)))
          (setf (id obj) (incf *count*))
-         ;;(format t "~&~A ~A ~A~&" "id2" (type-of id) (type-of (id obj)))
          (validate-descendants obj)))))
   (defmethod validate-internalized-jsync ((obj reified-reference))
     (let ((mapping (lookup *map* (id obj))))
-      ;;(format t "~&~A ~A ~A~&" "mapping" (id obj) (type-of (id obj)))
       (if mapping
           (setf (id obj) (id mapping))
           (error "Object with id ~A not internalized." (id obj))))
