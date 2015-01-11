@@ -11,7 +11,7 @@ env:
 #    - LISP=clisp # lisp-interface-library won't build
 #    - LISP=clisp32 # lisp-interface-library won't build
 #    - LISP=cmucl
-    - LISP=ecl
+#    - LISP=ecl # stalls while building test package
 
 install:
   - if [ -x ./install.sh ] && head -2 ./install.sh | grep '^# cl-travis' > /dev/null;
