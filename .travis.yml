@@ -28,4 +28,4 @@ script:
                   (lambda (c h)
                     (declare (ignore c h))
                     (uiop:quit -1))))
-             (cl-jsync-test:run-all-tests))'
+             (cl-jsync-test:test-all))'
