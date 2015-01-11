@@ -334,15 +334,26 @@
 (defun encode-jsync (obj &optional stream)
   (externalize-jsync (marshal obj) stream))
 
-(defun encode-jsync (obj &optional stream)
-  (with-marshalling-environment
-    (traverse obj)
-    (reify-document obj)
-    (externalize-jsync-document stream)
-    ))
 
 (defun encode-jsync-object (obj &optional stream)
+  "Encode a single monolithic object, encoding and declaring (with &) each
+sub-object completely when it is first reached, then inserting references
+(with *) when the same subobject appears again. For large object graphs, this
+may create a JSON structure that exceeds a JavaScript implementation's maximum
+parse depth."
   (let ((*shallow* nil))
     (with-marshalling-environment
       (traverse obj)
       (externalize-jsync (reify obj) stream))))
+
+(defun encode-jsync (obj &optional stream)
+  "Encode a JSYNC document whose contents are a single array consisting of every
+object reachable from `obj`. This creates a more shallow encoding in which every
+object with more than one incoming path appears in other objects' trees only as
+a reference (with *). This way we will not exceed a JavaScript implementation's
+maximum parse depth, at the small cost of an additional assembly step
+implemented on the receiver's end."
+  (with-marshalling-environment
+    (traverse obj)
+    (reify-document obj)
+    (externalize-jsync-document stream)))
