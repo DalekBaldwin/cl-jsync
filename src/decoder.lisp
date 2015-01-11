@@ -54,7 +54,7 @@
                        (remove node-type (remove node-id parsed))))))))
 
 (defun internalize-string (parsed)
-  (if (eq (cl-ppcre:scan "[.]+[!&%*]" parsed) 0)
+  (if (eql (cl-ppcre:scan "[.]+[!&%*]" parsed) 0)
       (subseq parsed 1)
       parsed))
 
@@ -62,7 +62,7 @@
   (cond
     ((zerop (length parsed))
      nil)
-    ((eq (elt parsed 0) #\*)
+    ((eql (elt parsed 0) #\*)
      (make-instance 'reified-reference
                     :id (subseq parsed 1)))
     ((string= parsed "!!null")
@@ -75,7 +75,7 @@
            (null (cl-ppcre:split "&[^ ]+ ![^ ]+" header))
            (null (cl-ppcre:split "![^ ]+" header))
            (null (cl-ppcre:split "&[^ ]+" header)))
-       ;;(eq (elt header 0) #\&)
+       ;;(eql (elt header 0) #\&)
        ))
 
 (defun get-tag-from-list-header (header)
@@ -222,10 +222,10 @@
     nativized))
 
 (defmethod assemble ((obj cons))
-  (if (eq (type-of (car obj)) 'reified-reference)
+  (if (eql (type-of (car obj)) 'reified-reference)
     (setf (car obj) (assemble (car obj)))
     (assemble (car obj)))
-  (if (eq (type-of (cdr obj)) 'reified-reference)
+  (if (eql (type-of (cdr obj)) 'reified-reference)
     (setf (cdr obj) (assemble (cdr obj)))
     (assemble (cdr obj)))
   obj)
@@ -234,7 +234,7 @@
   (dolist (slot-def (closer-mop:class-slots (class-of obj)))
     (let* ((name (closer-mop:slot-definition-name slot-def))
            (value (slot-value obj name)))
-      (if (eq (type-of value) 'reified-reference)
+      (if (eql (type-of value) 'reified-reference)
           (setf (slot-value obj name) (assemble value))
           (assemble value))))
   obj)

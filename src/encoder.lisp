@@ -174,7 +174,7 @@
      (asdf::while-collecting (c)
        (dolist (slot-def (closer-mop:class-slots klass))
          ;; ignore :class-allocated slots for now... may need to reify classes?
-         (when (eq (closer-mop:slot-definition-allocation slot-def) :instance)
+         (when (eql (closer-mop:slot-definition-allocation slot-def) :instance)
            (c (list
                (let ((*print-case* :downcase))
                  (format nil "~a" (closer-mop:slot-definition-name slot-def)))
@@ -227,14 +227,8 @@
     (cond
       ;; get rid of this case and this method might be equivalent to traverse...
       ((zerop (incoming obj))
-
-       (reify-full obj 0)
-       ;;(make-instance 'reified-label
-       ;;               :id 0
-       ;;               :object (reify-full obj))
-       )
+       (reify-full obj 0))
       ((reified-p obj)
-       ;;id
        (make-instance 'reified-reference
                       :id id))
       (*shallow*
@@ -244,11 +238,7 @@
                       :id id))
       (t
        (mark-reified obj)
-       (reify-full obj id)
-       ;;(make-instance 'reified-label
-       ;;               :id id
-       ;;               :object (reify-full obj))
-       ))))
+       (reify-full obj id)))))
 
 (defun reify-document (root)
   (let ((id (registered root)))
@@ -274,7 +264,7 @@
 
 (defmethod externalize-jsync ((obj string) stream)
   (format stream
-          (if (eq (cl-ppcre:scan "[.]*[!&%*]" obj) 0)
+          (if (eql (cl-ppcre:scan "[.]*[!&%*]" obj) 0)
               "\".~A\"" ;; escape JSYNC special character prefixes
               "\"~A\"")
           obj))
@@ -356,4 +346,3 @@
     (with-marshalling-environment
       (traverse obj)
       (externalize-jsync (reify obj) stream))))
-

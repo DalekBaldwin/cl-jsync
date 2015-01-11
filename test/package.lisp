@@ -6,7 +6,7 @@
    #:test-there-and-back-again
    #:test-circular-list
    )
-  #+nil
+  #+nil ;; may want to do more internal tests later
   (:import-from :jsync
                 
                 ;; encoder.lisp
