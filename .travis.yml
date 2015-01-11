@@ -23,6 +23,7 @@ install:
 
 script:
   - cl -e '(in-package :cl-user)'
+       -e '(setf *print-circle* t)'
        -e '(ql:quickload (list :cl-jsync :cl-jsync-test))'
        -e '(let ((*debugger-hook*
                   (lambda (c h)
