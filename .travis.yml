@@ -2,15 +2,15 @@ language: common-lisp
 
 env:
   matrix:
-    - LISP=abcl
+#    - LISP=abcl # lisp-interface-library won't build
     - LISP=allegro
     - LISP=sbcl
     - LISP=sbcl32
     - LISP=ccl
     - LISP=ccl32
-    - LISP=clisp
-    - LISP=clisp32
-#    - LISP=cmucl # /home/travis/.cim/bin/cl: 4: .: Can't open /home/travis/.cim/config/current.3271
+#    - LISP=clisp # lisp-interface-library won't build
+#    - LISP=clisp32 # lisp-interface-library won't build
+#    - LISP=cmucl
     - LISP=ecl
 
 install:
