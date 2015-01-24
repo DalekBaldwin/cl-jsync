@@ -1,6 +1,6 @@
-(defpackage #:cl-jsync-test
-  (:use #:jsync #:cl #:stefil)
-  (:nicknames #:jsync-test)
+(defpackage :cl-jsync-test
+  (:use :jsync :cl :stefil)
+  (:nicknames :jsync-test)
   (:export
    #:test-all
    #:test-there-and-back-again
@@ -8,7 +8,7 @@
    )
   #+nil ;; may want to do more internal tests later
   (:import-from
-   #:jsync
+   :jsync
    
    ;; encoder.lisp
    #:counter

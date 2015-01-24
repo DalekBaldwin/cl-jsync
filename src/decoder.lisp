@@ -1,4 +1,4 @@
-(in-package #:jsync)
+(in-package :jsync)
 
 (defvar *map* nil)
 (defvar *count* nil)

@@ -1,4 +1,4 @@
-(in-package #:jsync)
+(in-package :jsync)
 
 #+nil
 (with-interface ((stateful:<hash-table> <equal>) stateful:<map>)

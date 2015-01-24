@@ -1,4 +1,4 @@
-(in-package #:cl)
+(in-package :cl)
 
 (pushnew :cl-jsync *features*)
 
@@ -12,9 +12,9 @@
 #+nil
 (named-readtables:in-readtable :cl-jsync)
 
-(defpackage #:cl-jsync
-  (:nicknames #:jsync)
-  (:use #:cl #:interface)
+(defpackage :cl-jsync
+  (:nicknames :jsync)
+  (:use :cl :interface)
   (:export
    #:encode-jsync
    #:encode-jsync-object
