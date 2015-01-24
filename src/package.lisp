@@ -19,6 +19,4 @@
    #:encode-jsync
    #:encode-jsync-object
    #:decode-jsync
-   #:def-serializable-class
-
-   ))
+   #:def-serializable-class))

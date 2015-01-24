@@ -1,4 +1,4 @@
-(in-package :jsync-test)
+(in-package #:jsync-test)
 
 (defsuite* test-all)
 

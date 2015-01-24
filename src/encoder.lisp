@@ -1,4 +1,4 @@
-(in-package :jsync)
+(in-package #:jsync)
 
 (defvar *map* nil
   "Maps object to ID.")
